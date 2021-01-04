@@ -1,5 +1,6 @@
 ﻿using ProgrammersBlog.Shared.Entities.Abstract;
 using System;
+using System.Collections.Generic;
 
 namespace ProgrammersBlog.Entities.Concrete
 {
@@ -18,5 +19,6 @@ namespace ProgrammersBlog.Entities.Concrete
         public virtual Category Category { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }
