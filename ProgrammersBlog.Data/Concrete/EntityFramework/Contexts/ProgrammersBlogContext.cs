@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProgrammersBlog.Data.Concrete.EntityFramework.Mappings;
 using ProgrammersBlog.Entities.Concrete;
 
 namespace ProgrammersBlog.Data.Concrete.EntityFramework.Contexts
@@ -15,6 +16,16 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Contexts
         {
             optionsBuilder.UseSqlServer(@"Server=DESKTOP-NOOAEV8\SQLEXPRESS;Database=ProgrammersBlogDB;Trusted_Connection=True;");
             base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new ArticleMap());
+            modelBuilder.ApplyConfiguration(new CategoryMap());
+            modelBuilder.ApplyConfiguration(new CommentMap());
+            modelBuilder.ApplyConfiguration(new RoleMap());
+            modelBuilder.ApplyConfiguration(new UserMap());
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
