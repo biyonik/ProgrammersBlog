@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using ProgrammersBlog.Data.Abstract;
 using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Entities.Dtos.Article;
@@ -13,10 +15,12 @@ namespace ProgrammersBlog.Services.Concrete
     public class ArticleManager : IArticleService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ArticleManager(IUnitOfWork unitOfWork)
+        public ArticleManager(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<IDataResult<ArticleDto>> Get(int articleId)
@@ -105,24 +109,52 @@ namespace ProgrammersBlog.Services.Concrete
                 null);
         }
 
-        public Task<IResult> Add(ArticleAddDto articleAddDto, string createdByName)
+        public async Task<IResult> Add(ArticleAddDto articleAddDto, string createdByName)
         {
-            throw new System.NotImplementedException();
+            Article article = _mapper.Map<Article>(articleAddDto);
+            article.CreatedByName = createdByName;
+            article.ModifiedByName = createdByName;
+            article.UserId = 1;
+            await _unitOfWork.Articles.AddAsync(article).ContinueWith(task => _unitOfWork.SaveAsync());
+            return new Result(ResultStatus.Success, $"'{articleAddDto.Title}' başlıklı makalenin eklenme işlemi başarılı");
         }
 
-        public Task<IResult> Update(ArticleUpdateDto articleUpdateDto, string modifiedByName)
+        public async Task<IResult> Update(ArticleUpdateDto articleUpdateDto, string modifiedByName)
         {
-            throw new System.NotImplementedException();
+            Article article = _mapper.Map<Article>(articleUpdateDto);
+            article.ModifiedByName = modifiedByName;
+            await _unitOfWork.Articles.UpdateAsync(article).ContinueWith(task => _unitOfWork.SaveAsync());
+            return new Result(ResultStatus.Success, $"'{articleUpdateDto.Title}' başlıklı makalenin güncelleme işlemi başarılı");
         }
 
-        public Task<IResult> Delete(int articleId, string modifiedByName)
+        public async Task<IResult> Delete(int articleId, string modifiedByName)
         {
-            throw new System.NotImplementedException();
+            bool result = await _unitOfWork.Articles.AnyAsync(a => a.Id == articleId);
+            if (result)
+            {
+                Article article = await _unitOfWork.Articles.GetAsync(a => a.Id == articleId);
+                article.ModifiedByName = modifiedByName;
+                article.ModifiedDate = DateTime.Now;
+                article.IsDeleted = true;
+                await _unitOfWork.Articles.DeleteAsync(article).ContinueWith(task => _unitOfWork.SaveAsync());
+                return new Result(ResultStatus.Success, $"{article.Title} başlıklı makalenin silinme işlemi başarılı");
+            }
+            return new Result(ResultStatus.Error, $"Makale silme işlemi başarısız! Böyle bir makale bulunamadı");
         }
 
-        public Task<IResult> HardDelete(int articleId)
+        public async Task<IResult> HardDelete(int articleId, string modifiedByName)
         {
-            throw new System.NotImplementedException();
+            bool result = await _unitOfWork.Articles.AnyAsync(a => a.Id == articleId);
+            if (result)
+            {
+                Article article = await _unitOfWork.Articles.GetAsync(a => a.Id == articleId);
+                article.ModifiedByName = modifiedByName;
+                article.ModifiedDate = DateTime.Now;
+                article.IsDeleted = true;
+                await _unitOfWork.Articles.DeleteAsync(article).ContinueWith(task => _unitOfWork.SaveAsync());
+                return new Result(ResultStatus.Success, $"{article.Title} başlıklı makalenin veri tabanından silinmesi işlemi başarılı");
+            }
+            return new Result(ResultStatus.Error, $"Makale silme işlemi başarısız! Böyle bir makale bulunamadı");
         }
     }
 }
