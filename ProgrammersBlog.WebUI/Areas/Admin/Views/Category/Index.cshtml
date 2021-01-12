@@ -7,6 +7,7 @@
 
 @if (Model.ResultStatus == ResultStatus.Success)
 {
+    <div id="modalPlaceHolder" aria-hidden="true"></div>
     <div class="card mb-4 my-4">
         <div class="card-header">
             <i class="fas fa-th-list mr-1"></i>
@@ -87,6 +88,9 @@
                 buttons: [
                     {
                         text: 'Ekle',
+                        attr: {
+                            id: 'btnAdd'
+                        },
                         className:'btn btn-sm btn-success',
                         action: function(e, dt, node, config) {
                             
@@ -248,6 +252,64 @@
                           "searchPlaceholder": "Ara",
                           "thousands": "."
                       } 
+            });
+            @* Datatable end here *@
+            
+            @* Ajax/GET _CategoryAddPartial içindeki modal form çağrılması*@
+            $(function() {
+                const url = '@Url.Action("Add", "Category")';
+                const modalPlaceHolderDiv = document.getElementById('modalPlaceHolder');
+                const btnAdd = document.getElementById('btnAdd');
+                  btnAdd.addEventListener('click', function(e) {
+                    $.get(url).done(function(data) {
+                        modalPlaceHolderDiv.innerHTML = data;
+                        const insideModal = modalPlaceHolderDiv.querySelectorAll(".modal")[0];
+                        $(insideModal).modal('show');
+                        $('#category-is-active-button').bootstrapSwitch();
+                    })
+                });
+                @* Ajax POST / Post form data CategoryAddDTO başlangıcı*@
+                $(modalPlaceHolderDiv).on('click', '#btnSave', function(e) {
+                    e.preventDefault();
+                    const form = $('#form-category-add');
+                    const actionUrl = form.attr('action');
+                    const dataToSend = form.serialize();
+                    $.post(actionUrl, dataToSend).done(function(data) {
+                        const categoryAddAjaxViewModel = jQuery.parseJSON(data);
+                        const newFormBody = $('.modal-body', categoryAddAjaxViewModel.CategoryAddPartial);
+                        $(modalPlaceHolderDiv).find('.modal-body').replaceWith(newFormBody);
+                        const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
+                        if (isValid) {
+                            $(modalPlaceHolderDiv).find('.modal').modal('hide');
+                            const newTableRow = 
+                            `
+                                <tr>
+                                    <td>${categoryAddAjaxViewModel.CategoryDto.Category.Id}</td>
+                                    <td>${categoryAddAjaxViewModel.CategoryDto.Category.Name}</td>
+                                    <td>${categoryAddAjaxViewModel.CategoryDto.Category.Description}</td>
+                                    <td>
+                                        ${categoryAddAjaxViewModel.CategoryDto.Category.IsActive ? ' <span class="badge badge-success" > Aktif </span>' : ' <span class="badge badge-danger" > Pasif </span>'}
+                                    </td>
+                                    <td>
+                                        ${categoryAddAjaxViewModel.CategoryDto.Category.IsDeleted ? '<span class="badge badge-danger" > Evet </span>' : '<span class="badge badge-success" > Hayır </span>'}
+                                    </td>
+                                    <td>${categoryAddAjaxViewModel.CategoryDto.Category.CreatedDate}</td>
+                                    <td>${categoryAddAjaxViewModel.CategoryDto.Category.CreatedByName}</td>
+                                    <td>-</td>
+                                </tr>
+                            `;
+                            const newTableRowObject = $(newTableRow);
+                            newTableRowObject.hide();
+                            $('#categoriesTable').append(newTableRowObject);
+                            newTableRowObject.fadeIn(3500);
+                            iziToast.success({
+                                title: 'Başarılı',
+                                message: `${categoryAddAjaxViewModel.CategoryDto.Message}`,
+                                position:'topCenter'
+                            });
+                        }
+                    });
+                });
             });
         })
     </script>

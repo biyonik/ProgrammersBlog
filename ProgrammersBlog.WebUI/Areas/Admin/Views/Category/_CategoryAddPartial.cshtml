@@ -1,0 +1,68 @@
+﻿@model ProgrammersBlog.Entities.Dtos.Category.CategoryAddDto
+
+<div class="modal fade" id="categoryAddModel" role="dialog" tabindex="-1" aria-labelledby="categoryAddModelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryAddModelLabel"><span class="fas fa-plus"></span> Yeni Kategori Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="İptal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Add" asp-controller="Category" asp-area="Admin" method="post" id="form-category-add">
+                    <input type="hidden" name="IsValid" value="@ViewData.ModelState.IsValid.ToString()">
+                    <div asp-validation-summary="All" class="text-danger" id="validation-summary" aria-hidden="true" style="display: none;"></div>
+                    <div class="row form-group">
+                        <div class="col-sm-3">
+                            <label asp-for="Name" class="col-form-label">Kategori Adı:</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <input type="text" asp-for="Name" class="form-control">
+                            <span class="text-danger" asp-validation-for="Name"></span>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-3">
+                            <label asp-for="Description" class="col-form-label">Açıklama:</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" asp-for="Description"></textarea>
+                            <span class="text-danger" asp-validation-for="Description"></span>
+                        </div>
+                        
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-3">
+                            <label asp-for="Note" class="col-form-label"></label>
+                        </div>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" asp-for="Note"></textarea>
+                            <span class="text-danger" asp-validation-for="Note"></span>
+                        </div>
+                        
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-3">
+                            <label asp-for="IsActive" class="col-form-label"></label>
+                        </div>
+                        <div class="col-sm-9">
+                            <input type="checkbox"
+                                   asp-for="IsActive"
+                                   id="category-is-active-button"
+                                   data-on-text="Aktif"
+                                   data-off-text="Pasif">
+                            <span class="text-danger" asp-validation-for="IsActive"></span>
+                        </div>
+                        
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark btn-block" data-dismiss="modal"><span class="fas fa-times"></span> İptal</button>
+                <button type="submit" class="btn btn-outline-success btn-block" id="btnSave"><span class="fas fa-save"></span> Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
