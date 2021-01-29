@@ -17,7 +17,7 @@ namespace ProgrammersBlog.WebUI
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews().AddJsonOptions(options =>
+            services.AddControllersWithViews().AddRazorRuntimeCompilation().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;    
