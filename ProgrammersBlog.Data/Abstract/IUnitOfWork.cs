@@ -9,8 +9,6 @@ namespace ProgrammersBlog.Data.Abstract
         IArticleRepository Articles { get; } 
         ICategoryRepository Categories { get; }
         ICommentRepository Comments { get; }
-        IRoleRepository Roles { get; }
-        IUserRepository Users { get; } 
         // _unitOfWork.Users.AddAsync(user);
         // _unitOfWork.Categories.AddAsync(category)
         // _unitOfWork.SaveAsync()
